@@ -5,6 +5,11 @@ st.title("Rostering Program")
 
 #new_emp = st.text_input('Please enter the employee name')
 
+@st.cache(allow_output_mutation=True)
+def get_data():
+    return []
+
+
 emp_list = st.selectbox("Employee Name",
 ('James','Molly','Sam','Melissa'))
 
@@ -13,6 +18,7 @@ date = st.date_input("Select Date")
 shift = st.radio("Please select your shift",
 ('Day','Night'))
 
-df = pd.DataFrame(columns=['Date','Employee','Shift'])
+if st.button('Update'):
+    get_data().append({'Employee':emp_list,'Date':date,'Shift':shift})
 
-st.dataframe(df)
+st.write(pd.DataFrame(get_data()))
