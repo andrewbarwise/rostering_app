@@ -1,10 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Rostering Program")
-
-#new_emp = st.text_input('Please enter the employee name')
-
 @st.cache(allow_output_mutation=True)
 def get_data():
     return []
