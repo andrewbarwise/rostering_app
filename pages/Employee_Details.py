@@ -12,11 +12,14 @@ if st.checkbox("Show current employees"):
     st.subheader("Current Employees")
     st.table(employees_df)
 
-st.subheader('Add Employees')
+st.subheader('Edit the employees dataframe')
+option = st.selectbox('What action would you like to perform',('Add Employee','Remove Employee'))
 
+name = st.text_input('Enter the employees name')
+depot = st.selectbox('Select the depot',('Perth','Bunbury'))
 
-st.subheader("Remove Employees")
-
-
+if st.button('Update'):
+    employees_df.concat({'Name':name,'Depot':depot,'Position':'Controller'}, ignore_index=True)
+    employees_df.to_csv('data/employees.csv')
 
 
