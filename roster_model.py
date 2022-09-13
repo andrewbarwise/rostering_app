@@ -1,7 +1,7 @@
 from ortools.sat.python import cp_model
 
 def main():
-    num_cont = 5
+    num_cont = 10
     num_shifts = 2
     num_days = 7
 
@@ -9,7 +9,17 @@ def main():
     all_shifts = range(num_shifts)
     all_days = range(num_days)
 
-    shift_requests = [[[0, 0 ], [0, 0], [0, 0], [0, 0], [0, 1],
+    shift_requests = [[[0, 0], [0, 0], [0, 0], [0, 0], [0, 1],
+                       [0, 1], [0, 0]],
+                      [[0, 0], [0, 0], [1, 0], [1, 0], [0, 0],
+                       [0, 0], [0, 0]],
+                      [[0, 1,], [1, 0], [0, 0], [1,0], [0, 0],
+                       [0, 1], [0, 0]],
+                      [[0, 0,], [0, 0], [1,0], [1, 0], [0, 0],
+                       [1, 0], [0, 0]],
+                      [[0, 0], [0, 1], [1, 0], [0,0], [1, 0],
+                       [0, 1], [0, 0]],
+                       [[0, 0], [0, 0], [0, 0], [0, 0], [0, 1],
                        [0, 1], [0, 0]],
                       [[0, 0], [0, 0], [1, 0], [1, 0], [0, 0],
                        [0, 0], [0, 0]],
@@ -32,10 +42,9 @@ def main():
                 shifts[(n,d,s)] = model.NewBoolVar('shift_n%id%is%i' % (n,d,s))
     
     # each shift is assigned to exactly one controller
-    # this will need to be changed to have ~10 controllers on shift
     for d in all_days:
         for s in all_shifts:
-            model.AddExactlyOne(shifts[(n,d,s)] for n in all_cont)
+            model.Add(sum(shifts[(n,d,s)] for n in all_cont) == 10)
 
     # ensure each controller only works one shift per day
     for n in all_cont:
@@ -61,4 +70,32 @@ def main():
         model.Add(min_shifts_per_cont <= num_shifts_worked)
         model.Add(num_shifts_worked <= max_shifts_per_cont)
 
+    model.Maximize(sum(shift_requests[n][d][s] * shifts[(n,d,s)] for n in all_cont
+                    for d in all_days for s in all_shifts))
     
+    # create the model and solve
+    solver = cp_model.CpSolver()
+    status = solver.Solve(model)
+
+    with open('roster.txt', 'w') as f:
+        if status == cp_model.OPTIMAL:
+            print("Solution: ")
+            for d in all_days:
+                print("Day", d)
+                for n in all_cont:
+                    for s in all_shifts:
+                        if solver.Value(shifts[(n,d,s)]) == 1:
+                            if shift_requests[n][d][s] == 1:                                
+                                print("Controller", n, "works shift", s, "(requested).")
+                            else:
+                                print("Controller", n, "works shift", s, "(not requested).")
+
+                #print()
+            print(f"Number of shift requests met = {solver.ObjectiveValue()}",
+                    f"(out of {num_cont * min_shifts_per_cont})")
+
+        else:
+            print("No optimal solution found")
+
+if __name__ == '__main__':
+    main()
