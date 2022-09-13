@@ -19,8 +19,8 @@ if st.checkbox("Show Leave Requests"):
     st.subheader("Leave Requests")
     st.table(st.session_state.availability_df)
 
+st.subheader("Update Leave Requests")
 
-# this needs to be a list from the employees csv file
 emp_list = st.selectbox("Employee Name",names)
 
 date = st.date_input("Select Date")
@@ -28,8 +28,6 @@ date = st.date_input("Select Date")
 #shift = st.radio("Please select your shift",
 #('Day','Night'))
 
-
-st.subheader('Edit the employees dataframe')
 
 if st.button('Update'):
     new_entry = [{'Employee':emp_list, 'Date':date}]
