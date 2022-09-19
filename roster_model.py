@@ -1,34 +1,24 @@
 from ortools.sat.python import cp_model
 
 def main():
-    num_cont = 10
-    num_shifts = 2
+    num_cont = 5
+    num_shifts = 3
     num_days = 7
 
     all_cont = range(num_cont)
     all_shifts = range(num_shifts)
     all_days = range(num_days)
 
-    shift_requests = [[[0, 0], [0, 0], [0, 0], [0, 0], [0, 1],
-                       [0, 1], [0, 0]],
-                      [[0, 0], [0, 0], [1, 0], [1, 0], [0, 0],
-                       [0, 0], [0, 0]],
-                      [[0, 1,], [1, 0], [0, 0], [1,0], [0, 0],
-                       [0, 1], [0, 0]],
-                      [[0, 0,], [0, 0], [1,0], [1, 0], [0, 0],
-                       [1, 0], [0, 0]],
-                      [[0, 0], [0, 1], [1, 0], [0,0], [1, 0],
-                       [0, 1], [0, 0]],
-                       [[0, 0], [0, 0], [0, 0], [0, 0], [0, 1],
-                       [0, 1], [0, 0]],
-                      [[0, 0], [0, 0], [1, 0], [1, 0], [0, 0],
-                       [0, 0], [0, 0]],
-                      [[0, 1,], [1, 0], [0, 0], [1,0], [0, 0],
-                       [0, 1], [0, 0]],
-                      [[0, 0,], [0, 0], [1,0], [1, 0], [0, 0],
-                       [1, 0], [0, 0]],
-                      [[0, 0], [0, 1], [1, 0], [0,0], [1, 0],
-                       [0, 1], [0, 0]]]
+    shift_requests = [[[0, 0, 1], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 1],
+                       [0, 1, 0], [0, 0, 1]],
+                      [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0], [1, 0, 0],
+                       [0, 0, 0], [0, 0, 1]],
+                      [[0, 1, 0], [0, 1, 0], [0, 0, 0], [1, 0, 0], [0, 0, 0],
+                       [0, 1, 0], [0, 0, 0]],
+                      [[0, 0, 1], [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 0],
+                       [1, 0, 0], [0, 0, 0]],
+                      [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 0, 0], [1, 0, 0],
+                       [0, 1, 0], [0, 0, 0]]]
 
     # create the model
     model = cp_model.CpModel()
@@ -41,10 +31,10 @@ def main():
             for s in all_shifts:
                 shifts[(n,d,s)] = model.NewBoolVar('shift_n%id%is%i' % (n,d,s))
     
-    # each shift is assigned to exactly one controller
+    # assign the number of controllers required for each shift 
     for d in all_days:
         for s in all_shifts:
-            model.Add(sum(shifts[(n,d,s)] for n in all_cont) == 10)
+            model.Add(sum(shifts[(n,d,s)] for n in all_cont) == 1)
 
     # ensure each controller only works one shift per day
     for n in all_cont:
