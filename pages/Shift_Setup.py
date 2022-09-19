@@ -27,3 +27,6 @@ if st.checkbox("Show shift setup data"):
     st.subheader("Shifts")
     st.table(st.session_state.shift_df)
 
+# save the shift_df as a csv file into the data folder
+st.session_state.shift_df.to_csv("data\shift_setup.csv")
+
